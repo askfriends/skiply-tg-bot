@@ -212,8 +212,7 @@ def error(update, context):
     logging.error(f'Update {update} caused error {context.error}')
  
 def main():
-    
-    TOKEN = ""
+    TOKEN = os.environ.get("TOKEN", "")
     updater = Updater(token=TOKEN, use_context=True)
     dispatcher = updater.dispatcher
     
@@ -228,12 +227,6 @@ def main():
     Filters.command, unknown))
     updater.dispatcher.add_error_handler(error)
   
-    # Filters out unknown messages.
-    #updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
-    PORT = int(os.environ.get('PORT', '443'))
-    HOOK_URL = 'https://tgbot-ojjchq.aws-eu-1.ccdns.co' + '/' + TOKEN
-    updater.start_webhook(listen='0.0.0.0', port=PORT, url_path=TOKEN, webhook_url=HOOK_URL)
-    updater.idle()
+   updater.start_polling()
+   updater.idle()
 
-if __name__ == '__main__':
-    main()
