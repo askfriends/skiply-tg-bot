@@ -135,7 +135,7 @@ def bypass(update, context):
                         update.message.reply_text("🔴 Sorry, Something went wrong!",quote=True)
                         logging.info("🔴 Error: Something went wrong!")
                         
-                 elif (res.domain == "gplinks"):
+                elif (res.domain == "gplinks"):
                     msg = sendMessage(f"⫸ <b>Processing:</b> <code>{url}</code>", context.bot, update)
                     logging.info(f"Processing: {url}")
                     try:
