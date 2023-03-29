@@ -68,7 +68,25 @@ def url_validate(url) -> bool:
         return False
         
         
+def gplinks_bypass(url: str):
+ client = cloudscraper.create_scraper(allow_brotli=False)  
+ domain ="https://gplinks.co/"
+ referer = "https://mynewsmedia.co/"
 
+ vid = client.get(url, allow_redirects= False).headers["Location"].split("=")[-1]
+ url = f"{url}/?{vid}"
+
+ response = client.get(url, allow_redirects=False)
+ soup = BeautifulSoup(response.content, "html.parser")
+    
+    
+ inputs = soup.find(id="go-link").find_all(name="input")
+ data = { input.get('name'): input.get('value') for input in inputs }
+    
+ time.sleep(10)
+ headers={"x-requested-with": "XMLHttpRequest"}
+ bypassed_url = client.post(domain+"links/go", data=data, headers=headers).json()["url"]
+ return bypassed_url
 
 def bypass(update, context):        
 
@@ -117,7 +135,28 @@ def bypass(update, context):
                         update.message.reply_text("🔴 Sorry, Something went wrong!",quote=True)
                         logging.info("🔴 Error: Something went wrong!")
                         
+                 if (res.domain == "gplinks"):
+                    msg = sendMessage(f"⫸ <b>Processing:</b> <code>{url}</code>", context.bot, update)
+                    logging.info(f"Processing: {url}")
+                    try:
+                        bypassed_link = gplinks_bypass(url)
+                        deleteMessage(context.bot, msg)
+                        update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
+                                f" *✅ Ad Link Bypassed!*\n"
+                                f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
+                                f"👉 {bypassed_link}\n\n\n"
+                                f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
+                                f" *Bot by KATPER*\n"
+                                f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n",
+                                parse_mode="Markdown",
+                                disable_web_page_preview=True,
+                                quote=True)
                 
+                        logging.info("Link bypassed successfully!")
+                    except:
+                        deleteMessage(context.bot, msg)
+                        update.message.reply_text("🔴 Sorry, Something went wrong!",quote=True)
+                        logging.info("🔴 Error: Something went wrong!")
                         
                 elif (res.domain == "gdtot"):
                     msg = sendMessage(f"⫸ <b>Processing GDTOT:</b> <code>{url}</code>", context.bot, update)
