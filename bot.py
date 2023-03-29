@@ -227,6 +227,9 @@ def main():
     Filters.command, unknown))
     updater.dispatcher.add_error_handler(error)
   
-   updater.start_polling()
-   updater.idle()
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
 
