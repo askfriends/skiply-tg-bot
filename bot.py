@@ -221,10 +221,10 @@ def main():
     updater.dispatcher.add_handler(CommandHandler('owner', owner))
     updater.dispatcher.add_handler(CommandHandler('help', help))
     #updater.dispatcher.add_handler(CommandHandler('zip', zip))
-    updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
-    updater.dispatcher.add_handler(MessageHandler(
+    #updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
+    #updater.dispatcher.add_handler(MessageHandler(
     # Filters out unknown commands
-    Filters.command, unknown))
+    #Filters.command, unknown))
     updater.dispatcher.add_error_handler(error)
   
     updater.start_polling()
