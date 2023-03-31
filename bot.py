@@ -14,14 +14,13 @@
     added status msg when link is being converted. ------- 28-12-2022
     added check to see if link is provided or not ------- 02-01-2023
 """
-from telegram.ext.updater import Updater
-from telegram.update import Update
-from telegram.ext.callbackcontext import CallbackContext
-from telegram.ext.commandhandler import CommandHandler
-from telegram.ext.messagehandler import MessageHandler
-from telegram.ext.filters import Filters
+#from telegram.ext import Application, CommandHandler
+#from telegram.ext.updater import Updater
+#from application.updater import Update
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler
+#from telegram.ext.callbackcontext import CallbackContext
 from telegram import Update
-from telegram.message import Message
+from telegram import Message
 import telegram
 from tld import get_tld
 import PyBypass as bypasser
@@ -47,15 +46,15 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logging.info('Starting Bot...')
 logging.info(BANNER)  
 
-def sendMessage(text: str, bot, update: Update):
-        return bot.send_message(update.message.chat_id,
+async def sendMessage(text: str, bot, update: Update):
+        return await bot.send_message(update.message.chat_id,
                                 reply_to_message_id=update.message.message_id,
                                 text=text, parse_mode='HTMl',
                                 disable_web_page_preview=True)
  
         
-def deleteMessage(bot, message: Message):
-        bot.delete_message(chat_id=message.chat.id,
+async def deleteMessage(bot, message: Message):
+        await bot.delete_message(chat_id=message.chat.id,
                            message_id=message.message_id)
 
 def url_validate(url) -> bool:
@@ -68,31 +67,13 @@ def url_validate(url) -> bool:
         return False
         
         
-def gplinks_bypass(url: str):
- client = cloudscraper.create_scraper(allow_brotli=False)  
- domain ="https://gplinks.co/"
- referer = "https://mynewsmedia.co/"
 
- vid = client.get(url, allow_redirects= False).headers["Location"].split("=")[-1]
- url = f"{url}/?{vid}"
 
- response = client.get(url, allow_redirects=False)
- soup = BeautifulSoup(response.content, "html.parser")
-    
-    
- inputs = soup.find(id="go-link").find_all(name="input")
- data = { input.get('name'): input.get('value') for input in inputs }
-    
- time.sleep(10)
- headers={"x-requested-with": "XMLHttpRequest"}
- bypassed_url = client.post(domain+"links/go", data=data, headers=headers).json()["url"]
- return bypassed_url
-
-def bypass(update, context):        
+async def bypass(update, context: ContextTypes.DEFAULT_TYPE):        
 
     if len(context.args) == 0: #If empty command is sent without url
         logging.info("Error: No Link provided!")
-        update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
+        await update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                             f" *‼ No link provided!*\n"
                             f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
                             f"👉 Send command as <code>/bypass url</code>\n\n\n"
@@ -118,7 +99,7 @@ def bypass(update, context):
                     try:
                         bypassed_link = bypasser.bypass(url, name="linkvertise")
                         deleteMessage(context.bot, msg)
-                        update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
+                        await update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                 f" *✅ Ad Link Bypassed!*\n"
                                 f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
                                 f"👉 {bypassed_link}\n\n\n"
@@ -132,31 +113,10 @@ def bypass(update, context):
                         logging.info("Link bypassed successfully!")
                     except:
                         deleteMessage(context.bot, msg)
-                        update.message.reply_text("🔴 Sorry, Something went wrong!",quote=True)
+                        await update.message.reply_text("🔴 Sorry, Something went wrong!",quote=True)
                         logging.info("🔴 Error: Something went wrong!")
                         
-                elif (res.domain == "gplinks"):
-                    msg = sendMessage(f"⫸ <b>Processing:</b> <code>{url}</code>", context.bot, update)
-                    logging.info(f"Processing: {url}")
-                    try:
-                        bypassed_link = gplinks_bypass(url)
-                        deleteMessage(context.bot, msg)
-                        update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
-                                f" *✅ Ad Link Bypassed!*\n"
-                                f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
-                                f"👉 {bypassed_link}\n\n\n"
-                                f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
-                                f" *Bot by KATPER*\n"
-                                f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n",
-                                parse_mode="Markdown",
-                                disable_web_page_preview=True,
-                                quote=True)
                 
-                        logging.info("Link bypassed successfully!")
-                    except:
-                        deleteMessage(context.bot, msg)
-                        update.message.reply_text("🔴 Sorry, Something went wrong!",quote=True)
-                        logging.info("🔴 Error: Something went wrong!")
                         
                 elif (res.domain == "gdtot"):
                     msg = sendMessage(f"⫸ <b>Processing GDTOT:</b> <code>{url}</code>", context.bot, update)
@@ -165,7 +125,7 @@ def bypass(update, context):
                     try:
                         bypassed_link = PyBypass.bypass(url, gdtot_crypt=crypt)
                         deleteMessage(context.bot, msg)
-                        update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
+                        await update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                 f" *✅ GDTOT Link copied!*\n"
                                 f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
                                 f"👉 {bypassed_link}\n\n\n"
@@ -178,7 +138,7 @@ def bypass(update, context):
                         logging.info("File copied to privided google account!")
                     except:
                         deleteMessage(context.bot, msg)
-                        update.message.reply_text("🔴 Sorry, Something went wrong!",quote=True)
+                        await update.message.reply_text("🔴 Sorry, Something went wrong!",quote=True)
                         logging.info("🔴 Error: Something went wrong!")
                         
                 else:
@@ -187,7 +147,7 @@ def bypass(update, context):
                     try:
                         bypassed_link = bypasser.bypass(url)
                         deleteMessage(context.bot, msg)
-                        update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
+                        await update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                 f" *✅ Ad Link Bypassed!*\n"
                                 f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
                                 f"👉 {bypassed_link}\n\n\n"
@@ -202,10 +162,10 @@ def bypass(update, context):
                     except:
                         
                         deleteMessage(context.bot, msg)
-                        update.message.reply_text("🔴 Sorry, Link is not supported!",quote=True)
+                        await update.message.reply_text("🔴 Sorry, Link is not supported!",quote=True)
                         logging.info("🔴 Error: Link is not supported!")   
             else:
-                update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
+                await update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                             f" *‼ Invalid Link!*\n"
                             f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
                             f"👉 You havnt provided any valid link.\n\n\n"
@@ -218,17 +178,17 @@ def bypass(update, context):
                 logging.info("🔴 Error: Link is not valid!")  
             
    
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text("Hello, This is bypasser bot made by KATPER SAHAB")
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Hello, This is bypasser bot made by KATPER SAHAB")
     logging.info("/start command!")
 
-def owner(update: Update, context: CallbackContext):
-    update.message.reply_text("Owner of this bot is 💫 KATPER SAHAB",
+async def owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Owner of this bot is 💫 KATPER SAHAB",
                             quote=True)
     logging.info("/owner command!")
 
-def help(update: Update, context: CallbackContext):
-    update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                             f" *❓ HELP*\n"
                             f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
                             f"Type /bypass <url> \nSupported Sites: https://katb.in/abefuqetoxe \n"
@@ -239,36 +199,35 @@ def help(update: Update, context: CallbackContext):
                             quote=True) 
     logging.info("/help command!")
     
-#def unknown_text(update: Update, context: CallbackContext):
-#    update.message.reply_text("Sorry I can't recognize you , you said '%s'" % update.message.text)
+#async def unknown_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#    await update.message.reply_text("Sorry I can't recognize you , you said '%s'" % update.message.text)
 #    logging.info("unknown command!")
   
-#def unknown(update: Update, context: CallbackContext):
- #   update.message.reply_text("Sorry '%s' is not a valid command" % update.message.text)    
+#async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
+ #   await update.message.reply_text("Sorry '%s' is not a valid command" % update.message.text)    
 
-def error(update, context):
+async def error(update, context: ContextTypes.DEFAULT_TYPE):
     # Logs errors
     logging.error(f'Update {update} caused error {context.error}')
  
 def main():
-    TOKEN = os.environ.get("TOKEN", "")
-    updater = Updater(token=TOKEN, use_context=True)
-    dispatcher = updater.dispatcher
+    TOKEN = "1795538833:AAGD_CGcg3k0KEZSrgJw04RqKvQ6NH45MEU"
+    application = Application.builder().token("1795538833:AAGD_CGcg3k0KEZSrgJw04RqKvQ6NH45MEU").build()
+    #updater = Updater(token=TOKEN, )
+    #application = updater.application
     
-    updater.dispatcher.add_handler(CommandHandler('bypass', bypass))
-    updater.dispatcher.add_handler(CommandHandler('start', start))
-    updater.dispatcher.add_handler(CommandHandler('owner', owner))
-    updater.dispatcher.add_handler(CommandHandler('help', help))
-    #updater.dispatcher.add_handler(CommandHandler('zip', zip))
-    #updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
-    #updater.dispatcher.add_handler(MessageHandler(
+    application.add_handler(CommandHandler('bypass', bypass))
+    application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('owner', owner))
+    application.add_handler(CommandHandler('help', help))
+    #updater.application.add_handler(CommandHandler('zip', zip))
+    #updater.application.add_handler(MessageHandler(filters.TEXT, unknown))
+    #updater.application.add_handler(MessageHandler(
     # Filters out unknown commands
-    #Filters.command, unknown))
-    updater.dispatcher.add_error_handler(error)
+    #filters.COMMAND, unknown))
+    application.add_error_handler(error)
   
-    updater.start_polling()
-    updater.idle()
+    application.run_polling()
 
 if __name__ == '__main__':
     main()
-
