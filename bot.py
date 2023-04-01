@@ -144,7 +144,7 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
                 elif (res.domain == "gdtot"):
                     msg = sendMessage(f"⫸ <b>Processing GDTOT:</b> <code>{url}</code>", context.bot, update)
                     logging.info(f"Processing GDTOT: {url}")
-                    crypt = "OXZIcTlGY053anFzaDEzUnIyeEF5Z3dxcTdkQWVhM2g5bjY0NnhlWERzQT0%3D" #CRYPT is env variable stored in codecapsules.io 
+                    crypt = os.environ.get("GDTOT", "") #CRYPT is env variable stored in codecapsules.io or doprax 
                     try:
                         bypassed_link = PyBypass.bypass(url, gdtot_crypt=crypt)
                         deleteMessage(context.bot, msg)
@@ -202,11 +202,11 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
             
    
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Hello, This is bypasser bot made by KATPER SAHAB")
+    await update.message.reply_text("Hello, This is bypasser bot made by  [KATPER SAHAB](https://github.com/askfriends/skiply-tg-bot/)
     logging.info("/start command!")
 
 async def owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Owner of this bot is 💫 KATPER SAHAB",
+    await update.message.reply_text("Bot made by 💫 KATPER SAHAB",
                             quote=True)
     logging.info("/owner command!")
 
@@ -215,8 +215,8 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             f" *❓ HELP*\n"
                             f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
                             f"Type /bypass <url> \nSupported Sites: https://katb.in/abefuqetoxe \n"
-                            f"Deployed On: https:// \n"
-                            f"Deployed Privately From: https://github.com/askfriends/",
+                            f"Deployed On: [Doprax](https://doprax.com) \n"
+                            f"Deployed From: https://github.com/askfriends/skiply-tg-bot",
                             parse_mode="Markdown",
                             disable_web_page_preview=True,
                             quote=True) 
@@ -234,7 +234,7 @@ async def error(update, context: ContextTypes.DEFAULT_TYPE):
     logging.error(f'Update {update} caused error {context.error}')
  
 def main():
-    TOKEN = environ.get('TOKEN', '')
+    TOKEN = os.environ.get('TOKEN', '')
     application = Application.builder().token(TOKEN).build()
     #updater = Updater(token=TOKEN, )
     #application = updater.application
@@ -243,7 +243,6 @@ def main():
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('owner', owner))
     application.add_handler(CommandHandler('help', help))
-    #updater.application.add_handler(CommandHandler('zip', zip))
     #updater.application.add_handler(MessageHandler(filters.TEXT, unknown))
     #updater.application.add_handler(MessageHandler(
     # Filters out unknown commands
