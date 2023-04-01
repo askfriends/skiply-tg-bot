@@ -234,8 +234,8 @@ async def error(update, context: ContextTypes.DEFAULT_TYPE):
     logging.error(f'Update {update} caused error {context.error}')
  
 def main():
-    #TOKEN = "1795538833:AAGD_CGcg3k0KEZSrgJw04RqKvQ6NH45MEU"
-    application = Application.builder().token("1795538833:AAGD_CGcg3k0KEZSrgJw04RqKvQ6NH45MEU").build()
+    TOKEN = environ.get('TOKEN', '')
+    application = Application.builder().token(TOKEN).build()
     #updater = Updater(token=TOKEN, )
     #application = updater.application
     
