@@ -202,7 +202,7 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
             
    
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Hello, This is bypasser bot made by  [KATPER SAHAB](https://github.com/askfriends/skiply-tg-bot/)
+    await update.message.reply_text("Hello, This is bypasser bot made by KATPER SAHAB https://github.com/askfriends/skiply-tg-bot
     logging.info("/start command!")
 
 async def owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -215,7 +215,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             f" *❓ HELP*\n"
                             f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
                             f"Type /bypass <url> \nSupported Sites: https://katb.in/abefuqetoxe \n"
-                            f"Deployed On: [Doprax](https://doprax.com) \n"
+                            f"Deployed On: Doprax \n"
                             f"Deployed From: https://github.com/askfriends/skiply-tg-bot",
                             parse_mode="Markdown",
                             disable_web_page_preview=True,
