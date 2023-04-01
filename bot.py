@@ -13,12 +13,11 @@
     added more formatting ------------------------------- 28-12-2022
     added status msg when link is being converted. ------- 28-12-2022
     added check to see if link is provided or not ------- 02-01-2023
+    added gplinks support thanks to --------------------- 01-04-2023
+    https://github.com/BloodyToolzz/Bloody-Bypasser
 """
-#from telegram.ext import Application, CommandHandler
-#from telegram.ext.updater import Updater
-#from application.updater import Update
+
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler
-#from telegram.ext.callbackcontext import CallbackContext
 from telegram import Update
 from telegram import Message
 import telegram
@@ -30,6 +29,10 @@ import sys
 import logging
 import requests
 import validators
+import time
+import cloudscraper
+from bs4 import BeautifulSoup
+
 
 
 #Made with Love by KATPER
@@ -67,7 +70,27 @@ def url_validate(url) -> bool:
         return False
         
         
+def gplinks_bypass(url: str):
+ client = cloudscraper.create_scraper(allow_brotli=False)  
+ domain ="https://gplinks.co/"
+ referer = "https://mynewsmedia.co/"
 
+ vid = client.get(url, allow_redirects= False).headers["Location"].split("=")[-1]
+ url = f"{url}/?{vid}"
+
+ response = client.get(url, allow_redirects=False)
+ soup = BeautifulSoup(response.content, "html.parser")
+    
+    
+ inputs = soup.find(id="go-link").find_all(name="input")
+ data = { input.get('name'): input.get('value') for input in inputs }
+    
+ time.sleep(10)
+ headers={"x-requested-with": "XMLHttpRequest"}
+ bypassed_url = client.post(domain+"links/go", data=data, headers=headers).json()["url"]
+ return bypassed_url
+
+#print(gplinks_bypass(url))
 
 async def bypass(update, context: ContextTypes.DEFAULT_TYPE):        
 
@@ -93,16 +116,16 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
             logging.info(f"Detected Link: {url}")
             logging.info(f"Detected Domain: {res.domain}")
             if res.domain in ["gplinks","try2link","adf","link-center","bitly","ouo","shareus","shortly","tinyurl","thinfi","hypershort","sirigan","gtlinks","theforyou","linkvertise","shortest","pkin","tekcrypt","short2url","rocklinks","rocklinks","moneykamalo","easysky","indianshortner","crazyblog","tnvalue","shortingly","dulink","bindaaslinks","pdiskshortener","mdiskshortner","earnl","rewayatcafe","crazyblog","bitshorten","rocklink","droplink","earn4link","tnlink","ez4short","xpshort","vearnl","adrinolinks","techymozo","linkbnao","linksxyz","short-jambo","droplink","linkpays","pi-l","tnlink","open2get","anonfiles","antfiles","1fichier","gofile","hxfile","krakenfiles","mdisk","mediafire","pixeldrain","racaty","sendcm","sfile","solidfiles","sourceforge","uploadbaz","uploadee","uppit","userscloud","wetransfer","yandex","zippyshare","fembed","mp4upload","streamlare","streamsb","streamtape","appdrive","gdtot","hubdrive","sharerpw"]:
-                if (res.domain == "link-center"):
-                    msg = sendMessage(f"⫸ <b>Processing:</b> <code>{url}</code>", context.bot, update)
-                    logging.info(f"Processing: {url}")
+                if (res.domain == "gplinks"):
+                    msg = await sendMessage(f"⫸ <b>Processing:</b> <code>{url}</code>", context.bot, update)
+                    logging.info(f"Processing gplinks: {url}")
                     try:
-                        bypassed_link = bypasser.bypass(url, name="linkvertise")
-                        deleteMessage(context.bot, msg)
+                        bypass_link = gplinks_bypass(url)
+                        await deleteMessage(context.bot, msg)
                         await update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                 f" *✅ Ad Link Bypassed!*\n"
                                 f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
-                                f"👉 {bypassed_link}\n\n\n"
+                                f"👉 {bypass_link}\n\n\n"
                                 f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                 f" *Bot by KATPER*\n"
                                 f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n",
@@ -112,7 +135,7 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
                 
                         logging.info("Link bypassed successfully!")
                     except:
-                        deleteMessage(context.bot, msg)
+                        await deleteMessage(context.bot, msg)
                         await update.message.reply_text("🔴 Sorry, Something went wrong!",quote=True)
                         logging.info("🔴 Error: Something went wrong!")
                         
@@ -146,7 +169,7 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
                     logging.info(f"Processing: {url}")
                     try:
                         bypassed_link = bypasser.bypass(url)
-                        deleteMessage(context.bot, msg)
+                        await deleteMessage(context.bot, msg)
                         await update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                 f" *✅ Ad Link Bypassed!*\n"
                                 f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
@@ -211,7 +234,7 @@ async def error(update, context: ContextTypes.DEFAULT_TYPE):
     logging.error(f'Update {update} caused error {context.error}')
  
 def main():
-    TOKEN = "1795538833:AAGD_CGcg3k0KEZSrgJw04RqKvQ6NH45MEU"
+    #TOKEN = "1795538833:AAGD_CGcg3k0KEZSrgJw04RqKvQ6NH45MEU"
     application = Application.builder().token("1795538833:AAGD_CGcg3k0KEZSrgJw04RqKvQ6NH45MEU").build()
     #updater = Updater(token=TOKEN, )
     #application = updater.application
