@@ -202,11 +202,11 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
             
    
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Hello, This is bypasser bot made by KATPER SAHAB https://github.com/askfriends/skiply-tg-bot
+    await update.message.reply_text("Hello, This is bypasser bot made by K.A.T.P.E.R")
     logging.info("/start command!")
 
 async def owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Bot made by 💫 KATPER SAHAB",
+    await update.message.reply_text("Bot made by 💫 K.A.T.P.E.R",
                             quote=True)
     logging.info("/owner command!")
 
