@@ -142,12 +142,12 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
                 
                         
                 elif (res.domain == "gdtot"):
-                    msg = sendMessage(f"⫸ <b>Processing GDTOT:</b> <code>{url}</code>", context.bot, update)
+                    msg = await sendMessage(f"⫸ <b>Processing GDTOT:</b> <code>{url}</code>", context.bot, update)
                     logging.info(f"Processing GDTOT: {url}")
                     crypt = os.environ.get("GDTOT", "") #CRYPT is env variable stored in codecapsules.io or doprax 
                     try:
                         bypassed_link = PyBypass.bypass(url, gdtot_crypt=crypt)
-                        deleteMessage(context.bot, msg)
+                        await deleteMessage(context.bot, msg)
                         await update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                 f" *✅ GDTOT Link copied!*\n"
                                 f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
@@ -160,12 +160,12 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
                                 quote=True)
                         logging.info("File copied to privided google account!")
                     except:
-                        deleteMessage(context.bot, msg)
+                        await deleteMessage(context.bot, msg)
                         await update.message.reply_text("🔴 Sorry, Something went wrong!",quote=True)
                         logging.info("🔴 Error: Something went wrong!")
                         
                 else:
-                    msg = sendMessage(f"⫸ <b>Processing:</b> <code>{url}</code>", context.bot, update)
+                    msg = await sendMessage(f"⫸ <b>Processing:</b> <code>{url}</code>", context.bot, update)
                     logging.info(f"Processing: {url}")
                     try:
                         bypassed_link = bypasser.bypass(url)
@@ -184,7 +184,7 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
                     
                     except:
                         
-                        deleteMessage(context.bot, msg)
+                        await deleteMessage(context.bot, msg)
                         await update.message.reply_text("🔴 Sorry, Link is not supported!",quote=True)
                         logging.info("🔴 Error: Link is not supported!")   
             else:
