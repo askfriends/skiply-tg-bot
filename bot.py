@@ -32,7 +32,7 @@ import validators
 import time
 import cloudscraper
 from bs4 import BeautifulSoup
-from functools import wraps
+#from functools import wraps
 
 
 #Made with Love by KATPER
@@ -48,7 +48,7 @@ BANNER = """\n
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logging.info('Starting Bot...')
 logging.info(BANNER)  
-
+'''
 ADMIN = os.environ.get('ADMIN','')
 LIST_OF_ADMINS = [ADMIN]
 
@@ -65,7 +65,7 @@ def restricted(func):
 @restricted
 async def my_handler(update, context):
     pass  # only accessible if `user_id` is in `LIST_OF_ADMINS`.
-
+'''
 async def sendMessage(text: str, bot, update: Update):
         return await bot.send_message(update.message.chat_id,
                                 reply_to_message_id=update.message.message_id,
