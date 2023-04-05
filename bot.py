@@ -18,7 +18,7 @@
 """
 
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import Message
 import telegram
 from tld import get_tld
@@ -32,7 +32,7 @@ import validators
 import time
 import cloudscraper
 from bs4 import BeautifulSoup
-
+from functools import wraps
 
 
 #Made with Love by KATPER
@@ -48,6 +48,23 @@ BANNER = """\n
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logging.info('Starting Bot...')
 logging.info(BANNER)  
+
+ADMIN = os.environ.get('ADMIN','')
+LIST_OF_ADMINS = [ADMIN]
+
+def restricted(func):
+    @wraps(func)
+    async def wrapped(update, context, *args, **kwargs):
+        user_id = update.effective_user.id
+        if user_id not in LIST_OF_ADMINS:
+            print(f"You dont have access to use this bot, sorry! {user_id}.")
+            return
+        return await func(update, context, *args, **kwargs)
+    return wrapped
+
+@restricted
+async def my_handler(update, context):
+    pass  # only accessible if `user_id` is in `LIST_OF_ADMINS`.
 
 async def sendMessage(text: str, bot, update: Update):
         return await bot.send_message(update.message.chat_id,
@@ -206,8 +223,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info("/start command!")
 
 async def owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Bot made by 💫 K.A.T.P.E.R",
-                            quote=True)
+    keyboard = [
+                [InlineKeyboardButton(text="Deployed From", url="https://github.com/askfriends/skiply-tg-bot")], 
+                [InlineKeyboardButton(text="Deployed To", url="http://doprax.com")],
+                ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("Bot made by 💫 KATPER SAHAB",reply_markup=reply_markup,quote=True)
     logging.info("/owner command!")
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
