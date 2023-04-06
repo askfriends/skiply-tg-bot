@@ -48,7 +48,7 @@ BANNER = """\n
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logging.info('Starting Bot...')
 logging.info(BANNER)  
-'''
+
 ADMIN = os.environ.get('ADMIN','')
 LIST_OF_ADMINS = [ADMIN]
 
@@ -65,7 +65,7 @@ def restricted(func):
 @restricted
 async def my_handler(update, context):
     pass  # only accessible if `user_id` is in `LIST_OF_ADMINS`.
-'''
+
 async def sendMessage(text: str, bot, update: Update):
         return await bot.send_message(update.message.chat_id,
                                 reply_to_message_id=update.message.message_id,
@@ -109,10 +109,18 @@ def gplinks_bypass(url: str):
 
 #print(gplinks_bypass(url))
 
-async def bypass(update, context: ContextTypes.DEFAULT_TYPE):        
+async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+                [InlineKeyboardButton(text="Deployed From", url="https://github.com/askfriends/skiply-tg-bot")], 
+                [InlineKeyboardButton(text="Deployed To", url="http://doprax.com")],
+                ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
 
     if len(context.args) == 0: #If empty command is sent without url
         logging.info("Error: No Link provided!")
+        
         await update.message.reply_text(f"➖➖➖➖➖➖➖➖➖➖➖➖\n"
                             f" *‼ No link provided!*\n"
                             f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n"
@@ -122,6 +130,7 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
                             f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n",
                             parse_mode="Markdown",
                             disable_web_page_preview=True,
+                            reply_markup=reply_markup,
                             quote=True)
     else:
     
@@ -148,6 +157,7 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
                                 f"➖➖➖➖➖➖➖➖➖➖➖➖\n\n",
                                 parse_mode="Markdown",
                                 disable_web_page_preview=True,
+                                reply_markup=reply_markup,
                                 quote=True)
                 
                         logging.info("Link bypassed successfully!")
@@ -256,7 +266,7 @@ async def error(update, context: ContextTypes.DEFAULT_TYPE):
     logging.error(f'Update {update} caused error {context.error}')
  
 def main():
-    TOKEN = os.environ.get('TOKEN', '')
+    TOKEN = os.environ.get('TOKEN', '1795538833:AAFCEp4_qgbPSjlHxo5TNpF_DoH7RGO0U54')
     application = Application.builder().token(TOKEN).build()
     #updater = Updater(token=TOKEN, )
     #application = updater.application
