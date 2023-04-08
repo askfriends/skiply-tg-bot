@@ -32,7 +32,7 @@ import validators
 import time
 import cloudscraper
 from bs4 import BeautifulSoup
-#from functools import wraps
+
 
 
 #Made with Love by KATPER
@@ -49,22 +49,25 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logging.info('Starting Bot...')
 logging.info(BANNER)  
 
-ADMIN = os.environ.get('ADMIN','')
-LIST_OF_ADMINS = [ADMIN]
+#ENV Variables
+#-----------------------------------------------------------------------------------------------
+TOKEN = os.environ.get('TOKEN', '')
+if len(TOKEN) == 0:
+    logging.info("TOKEN variable is missing! Exiting now")
+    exit(1)
 
-def restricted(func):
-    @wraps(func)
-    async def wrapped(update, context, *args, **kwargs):
-        user_id = update.effective_user.id
-        if user_id not in LIST_OF_ADMINS:
-            print(f"You dont have access to use this bot, sorry! {user_id}.")
-            return
-        return await func(update, context, *args, **kwargs)
-    return wrapped
+USER_NAME = os.environ.get('USER_NAME', '')
+crypt = os.environ.get("GDTOT", "") #CRYPT is env variable stored in codecapsules.io or doprax 
+if len(crypt) == 0:
+    logging.info("crypt variable is missing!")
+    
+SUDO_USERS = os.environ.get('SUDO_USERS', '1271425814')
+if len(SUDO_USERS) == 0:
+    logging.info("SUDO_USERS variable is missing! Exiting now")
+else:
+    SUDO_USERS = int(SUDO_USERS)
+#-----------------------------------------------------------------------------------------------
 
-@restricted
-async def my_handler(update, context):
-    pass  # only accessible if `user_id` is in `LIST_OF_ADMINS`.
 
 async def sendMessage(text: str, bot, update: Update):
         return await bot.send_message(update.message.chat_id,
@@ -171,7 +174,6 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
                 elif (res.domain == "gdtot"):
                     msg = await sendMessage(f"⫸ <b>Processing GDTOT:</b> <code>{url}</code>", context.bot, update)
                     logging.info(f"Processing GDTOT: {url}")
-                    crypt = os.environ.get("GDTOT", "") #CRYPT is env variable stored in codecapsules.io or doprax 
                     try:
                         bypassed_link = PyBypass.bypass(url, gdtot_crypt=crypt)
                         await deleteMessage(context.bot, msg)
@@ -229,7 +231,13 @@ async def bypass(update, context: ContextTypes.DEFAULT_TYPE):
             
    
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Hello, This is bypasser bot made by K.A.T.P.E.R")
+    keyboard = [
+                [InlineKeyboardButton(text="Deployed From", url="https://github.com/askfriends/skiply-tg-bot")], 
+                [InlineKeyboardButton(text="Deployed To", url="http://doprax.com")],
+                ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("Hello, This is bypasser bot made by K.A.T.P.E.R",reply_markup=reply_markup,quote=True)
     logging.info("/start command!")
 
 async def owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -266,10 +274,8 @@ async def error(update, context: ContextTypes.DEFAULT_TYPE):
     logging.error(f'Update {update} caused error {context.error}')
  
 def main():
-    TOKEN = os.environ.get('TOKEN', '1795538833:AAFCEp4_qgbPSjlHxo5TNpF_DoH7RGO0U54')
+    
     application = Application.builder().token(TOKEN).build()
-    #updater = Updater(token=TOKEN, )
-    #application = updater.application
     
     application.add_handler(CommandHandler('bypass', bypass))
     application.add_handler(CommandHandler('start', start))
